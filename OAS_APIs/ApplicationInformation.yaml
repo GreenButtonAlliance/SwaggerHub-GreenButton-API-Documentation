@@ -1,0 +1,195 @@
+openapi: 3.0.3
+info:
+  title: Green Button Resource Server API Documentation
+  description: ''
+  version: 1.0.0
+  contact:
+    name: Donald F. Coffin
+    url: https://greenbuttonalliance.org
+    email: dcoffin@greenbuttonalliance.org
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/GreenButtonAlliance/Green_Button_Resource_Server
+  - description: Green Button Alliance (GBA) Production ESPI Resource Server Sandbox
+    url: https://sandbox.greenbuttonalliance.org:8443/DataCustodian
+  - description: Green Button Alliance (GBA) Development ESPI Resource Server Sandbox
+    url: https://sandboxdev.greenbuttonalliance.org:8443/DataCustodian
+
+paths:
+  /espi/1_1/resource/ApplicationInformation:
+    get:
+      summary: List of all ApplicationInformation resources
+      tags:
+        - ApplicationInformation
+      operationId: getApplicationInformation
+      responses:
+        200:
+          description: OK
+          content:
+            application/atom+xml:
+              schema:
+                $ref: '#/components/schemas/ApplicationInformation'
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: Not Found
+
+components:
+  schemas:
+    ApplicationInformation:
+      type: object
+      required:
+        - dataCustodianId
+        - dataCustodianApplicationStatus
+        - thirdPartyNotifyUri
+        - authorizationServerAuthorizationEndpoint
+        - authorizationServerTokenEndpoint
+        - dataCustodianBulkRequestURI
+        - dataCustodianResourceEndpoint
+        - client_secret
+        - client_name
+        - redirect_uri
+        - client_id
+      properties:
+        dataCustodianId:
+          description: Data Custodian Id
+          type: string
+          maxLength: 64
+          example:
+            817212172021
+        dataCustodianApplicationStatus:
+          description: Code indicating the current status of the Data Custodian application
+          type: integer
+          example: 2
+          enum:
+            - 1  # Review
+            - 2  # Production (Live)
+            - 3  # On Hold
+            - 4  # Revoked
+        thirdPartyApplicationDescription:
+          description: Description of the Third Party application
+          type: string
+          maxLength: 256
+          example:
+            The SolarPower application helps electricity customers to reduce their energy expenses by converting
+            to solar energy.
+        thirdPartyApplicationStatus:
+          description: Code indicating the current status of the Third Party application
+          type: integer
+          example: 3
+          enum:
+            - 1  # Development
+            - 2  # Review/Test
+            - 3  # Production (Live)
+            - 4  # Retired (Removed)
+        thirdPartyApplicationType:
+          description: Code indicating the Third Party application type
+          type: integer
+          example: 1
+          enum:
+            - 1  # Web
+            - 2  # Desktop
+            - 3  # Mobile
+            - 4  # Device
+        thirdPartyApplicationUse:
+          description: Code indicating the expected use of the Third Party application
+          type: integer
+          example: 1
+          enum:
+            - 1  # Energy Management
+            - 2  # Analytical
+            - 3  # Governmental
+            - 4  # Academic
+            - 5  # Law Enforcement
+        thirdPartyPhone:
+          description: Third Party Application Technical Support phone number
+          type: string
+          maxLength: 32
+          example: (123) 456-7890
+        authorizationServerUri:
+          description: Base URI of the OAuth 2.0 Authorization Server
+          type: string
+          format: uri
+          example: https://sandbox.greenbuttonalliance.org:8443/DataCustodian
+        thirdPartyNotifyUri:
+          description: URI value used to notify the Third Party application the Data Custodian has data available
+          type: string
+          format: uri
+          example: https://sandbox.greenbuttonalliance.org:8443/ThirdParty/espi/1_1/Notification
+        authorizationServerAuthorizationEndpoint:
+          description: OAuth 2.0 Authorization Server's Authorization Endpoint
+          type: string
+          format: uri
+          example: https://sandbox.greenbuttonalliance.org:8443/DataCustodian/oauth/authorize
+        authorizationServerRegistrationEndpoint:
+          description: OAuth 2.0 Authorization Server's Dynamic Client Registration Endpoint
+          type: string
+          format: uri
+          example: https://sandbox.greenbuttonalliance.org:8443/DataCustodian/oauth/register
+        authorizationServerTokenEndpoint:
+          description: OAuth 2.0 Authorization Server's Token Endpoint
+          type: string
+          format: uri
+          example: https://sandbox.greenbuttonalliance.org:8443/DataCustodian/oauth/token
+        dataCustodianBulkRequestURI:
+          description: URI used by the Data Custodian to support Bulk API Request
+          type: string
+          format: uri
+          example: https://sandbox.greenbuttonalliance.org:8443/DataCustodian/espi/1_1/resource/Batch/Bulk/{bulkId}
+        dataCustodianResourceEndpoint:
+          description: Base value of Data Custodian Resource API URIs
+          type: string
+          format: uri
+          example: https://sandbox.greenbuttonalliance.org:8443/DataCustodian/espi/1_1/resource
+        thirdPartyScopeSelectionURI:
+          description: \[DEPRECATED\] URI of the Third Party's Scope Selection API used by Data Custodian Applications
+                       to initiate OAuth 2.0 Authorization Code Request
+          type: string
+          format: uri
+          example: https://sandbox.greenbuttonalliance.org:8443/ThirdParty/RetailCustomer/ScopeSelection
+        thirdPartyUserPortalScreenURI:
+          description: URI of the Third Party Application's starting screen
+          type: string
+          format: uri
+          example: https://sandbox.greenbuttonalliance.org:8443/ThirdParty/
+        client_secret:
+          description: OAuth 2.0 assigned **secret** provided by the Data Custodian during the Third Party Application registration process.
+          type: string
+          maxLength: 512
+          example: secret
+        logo_uri:
+          description: URI of Third Party logo
+          type: string
+          format: uri
+          example: https://sandbox.greenbuttonalliance.org:8443/ThirdParty/resources/ico/favicon.png
+        client_name:
+          description: The name of the registered Third Party Application
+          type: string
+          maxLength: 256
+          example: Green Button Alliance, Inc. Demonstration Third Party Application
+        client_uri:
+          description: URI of the Third Party Application's starting screen
+          type: string
+          format: uri
+          example: https://sandbox.greenbuttonalliance.org:8443/ThirdParty
+        redirect_uri:
+          description: Third Party Application's default OAuth 2.0 **Authorization Code** Request redirect_uri parameter value
+          type: array
+          items:
+            type: string
+            format: uri
+          example: https://sandbox.greenbuttonalliance.org:8443/ThirdParty/espi/1_1/OAuthCallBack
+        client_id:
+          description: Third Party Application Unique Identifier provided by the Data Custodian during the Third Party Application registration process.
+          type: string
+          maxLength: 64
+          example: 641d16dcbacb0e40e41d
