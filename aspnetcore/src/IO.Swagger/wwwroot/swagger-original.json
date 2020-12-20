@@ -1,7 +1,8 @@
 {
   "openapi" : "3.0.3",
   "info" : {
-    "title" : "Green Button Resource Server API Documentation",
+    "title" : "Green Button Resource Server ApplicationInformation API Documentation",
+    "description" : "The ApplicationInformation resource contains information used by Data Custodians and Third Party applications to communicate with each other.  The ApplicationInformation resource is created when a Third Party Application registers with a Data Custodian.",
     "contact" : {
       "name" : "Donald F. Coffin",
       "url" : "https://greenbuttonalliance.org",
@@ -27,7 +28,8 @@
     "/espi/1_1/resource/ApplicationInformation" : {
       "get" : {
         "tags" : [ "ApplicationInformation" ],
-        "summary" : "List of all ApplicationInformation resources",
+        "summary" : "Find all ApplicationInformation resource entries.",
+        "description" : "Returns all ApplicationInformation resource entries",
         "operationId" : "getApplicationInformation",
         "responses" : {
           "200" : {
@@ -51,6 +53,9 @@
           },
           "404" : {
             "description" : "Not Found"
+          },
+          "default" : {
+            "description" : "Not Found"
           }
         }
       }
@@ -59,7 +64,7 @@
   "components" : {
     "schemas" : {
       "ApplicationInformation" : {
-        "required" : [ "authorizationServerAuthorizationEndpoint", "authorizationServerTokenEndpoint", "client_id", "client_name", "client_secret", "dataCustodianApplicationStatus", "dataCustodianBulkRequestURI", "dataCustodianId", "dataCustodianResourceEndpoint", "redirect_uri", "thirdPartyNotifyUri" ],
+        "required" : [ "authorizationServerAuthorizationEndpoint", "authorizationServerTokenEndpoint", "client_id", "client_id_issued_at", "client_name", "client_secret", "client_secret_expires_at", "dataCustodianApplicationStatus", "dataCustodianBulkRequestURI", "dataCustodianId", "dataCustodianResourceEndpoint", "grant_types", "redirect_uri", "registration_access_token", "registration_client_uri", "response_types", "scope", "software_id", "software_version", "thirdPartyNotifyUri", "token_endpoint_auth_method" ],
         "type" : "object",
         "properties" : {
           "dataCustodianId" : {
@@ -196,31 +201,141 @@
             "type" : "string",
             "description" : "Third Party Application Unique Identifier provided by the Data Custodian during the Third Party Application registration process.",
             "example" : "641d16dcbacb0e40e41d"
+          },
+          "tos_uri" : {
+            "type" : "string",
+            "description" : "URI of the Third Party Application's Terms of Service",
+            "format" : "uri",
+            "example" : "https://sandbox.greenbuttonalliance.org:8443/ThirdParty/TermsOfService"
+          },
+          "policy_uri" : {
+            "type" : "string",
+            "description" : "URI of the Third Party Application's Usage Policy",
+            "format" : "uri",
+            "example" : "https://sandbox.greenbuttonalliance.org:8443/ThirdParty/UsagePolicy"
+          },
+          "software_id" : {
+            "maxLength" : 256,
+            "type" : "string",
+            "description" : "Third Party Application Software Identifier",
+            "example" : "Demo_ThirdParty_App"
+          },
+          "software_version" : {
+            "maxLength" : 32,
+            "type" : "string",
+            "description" : "Third Party Application Version",
+            "example" : "1.0.0"
+          },
+          "client_id_issued_at" : {
+            "type" : "integer",
+            "description" : "Epoch date/time the Data Custodian assigned the Third Party Application's client_id",
+            "format" : "int64",
+            "example" : 1608418866
+          },
+          "client_secret_expires_at" : {
+            "type" : "integer",
+            "description" : "Epoch date/time when the Data Custodian assigned client_secret expires (0 indicates the client_secret never expires)",
+            "format" : "int64",
+            "example" : 0
+          },
+          "contacts" : {
+            "type" : "array",
+            "description" : "Array of emails for Third Party Application support",
+            "example" : [ "dcoffin@greenbuttonalliance.org", "jroberts@greenbuttonalliance.org" ],
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "token_endpoint_auth_method" : {
+            "maxLength" : 32,
+            "type" : "string",
+            "description" : "Authentication method used by the OAuth 2.0 Token Endpoint",
+            "example" : "client_secret_basic",
+            "enum" : [ "client_secret_basic" ]
+          },
+          "scope" : {
+            "type" : "array",
+            "description" : "List of space separated OAuth 2.0 Scope parameter values a Third Party Application may use when requesting an OAuth 2.0 access token",
+            "items" : {
+              "maxLength" : 256,
+              "type" : "string",
+              "example" : "[\"FB=1_3_4_5_13_31_37_39;IntervalDuration=900;BlockDuration=monthly;HistoryLength=13\",\"FB=1_3_4_10_13_15_31_37_39;IntervalDuration=3600;BlockDuration=monthly;HistoryLength=13\",\"FB=1_3_4_11_13_31_37_39;IntervalDuration=900;BlockDuration=monthly;HistoryLength=13\"]"
+            }
+          },
+          "grant_types" : {
+            "type" : "array",
+            "description" : "OAuth 2.0 grant_types supported by the Data Custodian Application",
+            "items" : {
+              "maxLength" : 32,
+              "minItems" : 2,
+              "type" : "string",
+              "example" : "[\"authorization_code\",\"client_credentials\",\"refresh_token\"]",
+              "enum" : [ "authorization_code", "client_credentials", "refresh_token" ]
+            }
+          },
+          "response_types" : {
+            "maxLength" : 32,
+            "type" : "string",
+            "description" : "OAuth 2.0 response_types supported by the Data Custodian Application",
+            "example" : "code",
+            "enum" : [ "code" ]
+          },
+          "registration_client_uri" : {
+            "type" : "string",
+            "description" : "URI used by the Third Party Application to manage Registration Information (ApplicationInformation resource)",
+            "format" : "uri",
+            "example" : "https://sandbox.greenbuttonalliance.org:8443/DataCustpdian/espi/1_1/resource/ApplicationInformation/{applicationInformationId}"
+          },
+          "registration_access_token" : {
+            "type" : "string",
+            "description" : "OAuth 2.0 access token used by the Third Party Application to manage Registration Information (ApplicationInformation resource).  Either assigned by the Data Custodian during the Third Party Registration process or generated in response to a Third Party OAuth 2.0 Client Credentials Request with FB=44 in the Scope parameter.",
+            "format" : "uuid",
+            "example" : "c66b0854-ea1f-4e24-afb7-afab9e0f6c5e"
+          },
+          "dataCustodianScopeSelectionScreenURI" : {
+            "type" : "string",
+            "description" : "\\[DEPRECATED\\] URI used by the Third Party Application to obtain supported OAuth 2.0 Scope values during OAuth 2.0 Authorization Code Request",
+            "format" : "uri",
+            "example" : "https://sandbox.greenbuttonalliance.org:8443/DataCustpdian/RetailCustomer/ScopeSelectionList"
           }
         },
         "example" : {
           "thirdPartyApplicationType" : 1,
-          "thirdPartyNotifyUri" : "https://sandbox.greenbuttonalliance.org:8443/ThirdParty/espi/1_1/Notification",
           "client_uri" : "https://sandbox.greenbuttonalliance.org:8443/ThirdParty",
           "dataCustodianBulkRequestURI" : "https://sandbox.greenbuttonalliance.org:8443/DataCustodian/espi/1_1/resource/Batch/Bulk/{bulkId}",
-          "authorizationServerUri" : "https://sandbox.greenbuttonalliance.org:8443/DataCustodian",
           "dataCustodianApplicationStatus" : 2,
-          "authorizationServerRegistrationEndpoint" : "https://sandbox.greenbuttonalliance.org:8443/DataCustodian/oauth/register",
           "logo_uri" : "https://sandbox.greenbuttonalliance.org:8443/ThirdParty/resources/ico/favicon.png",
           "authorizationServerAuthorizationEndpoint" : "https://sandbox.greenbuttonalliance.org:8443/DataCustodian/oauth/authorize",
-          "thirdPartyPhone" : "(123) 456-7890",
+          "registration_client_uri" : "https://sandbox.greenbuttonalliance.org:8443/DataCustpdian/espi/1_1/resource/ApplicationInformation/{applicationInformationId}",
+          "registration_access_token" : "c66b0854-ea1f-4e24-afb7-afab9e0f6c5e",
           "client_id" : "641d16dcbacb0e40e41d",
+          "token_endpoint_auth_method" : "client_secret_basic",
+          "software_id" : "Demo_ThirdParty_App",
           "dataCustodianId" : "817212172021",
-          "dataCustodianResourceEndpoint" : "https://sandbox.greenbuttonalliance.org:8443/DataCustodian/espi/1_1/resource",
-          "thirdPartyApplicationStatus" : 3,
-          "thirdPartyApplicationDescription" : "The SolarPower application helps electricity customers to reduce their energy expenses by converting to solar energy.",
-          "thirdPartyApplicationUse" : 1,
+          "scope" : [ "[\"FB=1_3_4_5_13_31_37_39;IntervalDuration=900;BlockDuration=monthly;HistoryLength=13\",\"FB=1_3_4_10_13_15_31_37_39;IntervalDuration=3600;BlockDuration=monthly;HistoryLength=13\",\"FB=1_3_4_11_13_31_37_39;IntervalDuration=900;BlockDuration=monthly;HistoryLength=13\"]", "[\"FB=1_3_4_5_13_31_37_39;IntervalDuration=900;BlockDuration=monthly;HistoryLength=13\",\"FB=1_3_4_10_13_15_31_37_39;IntervalDuration=3600;BlockDuration=monthly;HistoryLength=13\",\"FB=1_3_4_11_13_31_37_39;IntervalDuration=900;BlockDuration=monthly;HistoryLength=13\"]" ],
           "authorizationServerTokenEndpoint" : "https://sandbox.greenbuttonalliance.org:8443/DataCustodian/oauth/token",
           "client_secret" : "secret",
-          "redirect_uri" : "https://sandbox.greenbuttonalliance.org:8443/ThirdParty/espi/1_1/OAuthCallBack",
+          "software_version" : "1.0.0",
+          "client_id_issued_at" : 1608418866,
           "thirdPartyUserPortalScreenURI" : "https://sandbox.greenbuttonalliance.org:8443/ThirdParty/",
           "client_name" : "Green Button Alliance, Inc. Demonstration Third Party Application",
-          "thirdPartyScopeSelectionURI" : "https://sandbox.greenbuttonalliance.org:8443/ThirdParty/RetailCustomer/ScopeSelection"
+          "thirdPartyScopeSelectionURI" : "https://sandbox.greenbuttonalliance.org:8443/ThirdParty/RetailCustomer/ScopeSelection",
+          "policy_uri" : "https://sandbox.greenbuttonalliance.org:8443/ThirdParty/UsagePolicy",
+          "thirdPartyNotifyUri" : "https://sandbox.greenbuttonalliance.org:8443/ThirdParty/espi/1_1/Notification",
+          "grant_types" : [ "[\"authorization_code\",\"client_credentials\",\"refresh_token\"]", "[\"authorization_code\",\"client_credentials\",\"refresh_token\"]" ],
+          "authorizationServerUri" : "https://sandbox.greenbuttonalliance.org:8443/DataCustodian",
+          "authorizationServerRegistrationEndpoint" : "https://sandbox.greenbuttonalliance.org:8443/DataCustodian/oauth/register",
+          "thirdPartyPhone" : "(123) 456-7890",
+          "dataCustodianScopeSelectionScreenURI" : "https://sandbox.greenbuttonalliance.org:8443/DataCustpdian/RetailCustomer/ScopeSelectionList",
+          "dataCustodianResourceEndpoint" : "https://sandbox.greenbuttonalliance.org:8443/DataCustodian/espi/1_1/resource",
+          "thirdPartyApplicationStatus" : 3,
+          "client_secret_expires_at" : 0,
+          "thirdPartyApplicationDescription" : "The SolarPower application helps electricity customers to reduce their energy expenses by converting to solar energy.",
+          "thirdPartyApplicationUse" : 1,
+          "redirect_uri" : "https://sandbox.greenbuttonalliance.org:8443/ThirdParty/espi/1_1/OAuthCallBack",
+          "tos_uri" : "https://sandbox.greenbuttonalliance.org:8443/ThirdParty/TermsOfService",
+          "contacts" : [ "dcoffin@greenbuttonalliance.org", "jroberts@greenbuttonalliance.org" ],
+          "response_types" : "code"
         }
       }
     }
